@@ -1,0 +1,126 @@
+using System;
+using System.Diagnostics;
+
+namespace Rozumatic_ASD_Lab5_Variant3
+{
+    public class Node<T>
+    {
+        public T Data { get; set; }
+        public Node<T>? Next { get; set; }
+
+        public Node(T data)
+        {
+            Data = data;
+            Next = null;
+        }
+    }
+
+    public class SinglyLinkedList<T> where T : IEquatable<T>
+    {
+        private Node<T>? _head;
+        private int _count;
+
+        public int Count => _count;
+        public bool IsEmpty => _count == 0;
+
+        public void AddFirst(T data)
+        {
+            Node<T> newNode = new Node<T>(data);
+            newNode.Next = _head;
+            _head = newNode;
+            _count++;
+        }
+
+        public void AddLast(T data)
+        {
+            Node<T> newNode = new Node<T>(data);
+            if (_head == null)
+            {
+                _head = newNode;
+            }
+            else
+            {
+                Node<T> current = _head;
+                while (current.Next != null) current = current.Next;
+                current.Next = newNode;
+            }
+            _count++;
+        }
+
+        public void Print()
+        {
+            Console.Write($"[Count={_count}]: ");
+            Node<T>? current = _head;
+            while (current != null)
+            {
+                Console.Write($"[{current.Data}] -> ");
+                current = current.Next;
+            }
+            Console.WriteLine("null");
+        }
+
+        // ==========================================
+        // ВАРІАНТ 3: Пошук з кінця (Tortoise and Hare) - O(n)
+        // ==========================================
+        public T? FindFromEnd(int indexFromEnd)
+        {
+            if (_head == null  indexFromEnd <= 0  indexFromEnd > _count) 
+                return default;
+
+            Node<T>? slow = _head;
+            Node<T>? fast = _head;
+
+            // Заєць робить N кроків вперед
+            for (int i = 0; i < indexFromEnd; i++)
+            {
+                if (fast == null) return default;
+                fast = fast.Next;
+            }
+
+            // Рухаємо обох, поки заєць не впаде в null
+            while (fast != null)
+            {
+                slow = slow!.Next;
+                fast = fast.Next;
+            }
+
+            return slow!.Data;
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            Console.WriteLine("=== ВАРІАНТ 3: ПОШУК З КІНЦЯ (Tortoise and Hare) ===\n");
+
+            SinglyLinkedList<string> list = new SinglyLinkedList<string>();
+            Stopwatch sw = Stopwatch.StartNew();
+
+            list.AddFirst("Київ");
+            list.AddFirst("Житомир");
+            list.AddLast("Львів");
+            list.AddLast("Одеса");
+            list.AddLast("Дніпро");
+            
+            Console.WriteLine("Поточний список:");
+            list.Print();
+
+            Console.WriteLine("\nШукаємо 2-й елемент з кінця:");
+            var element2 = list.FindFromEnd(2);
+            Console.WriteLine($"Знайдено: {element2} (очікується 'Одеса')");
+
+            Console.WriteLine("\nШукаємо 1-й елемент з кінця (останній):");
+            var element1 = list.FindFromEnd(1);
+            Console.WriteLine($"Знайдено: {element1} (очікується 'Дніпро')");
+
+            Console.WriteLine("\nШукаємо 5-й елемент з кінця (перший):");
+            var element5 = list.FindFromEnd(5);
+            Console.WriteLine($"Знайдено: {element5} (очікується 'Житомир')");
+
+            sw.Stop();
+            Console.WriteLine($"\n⏱️ Час роботи: {sw.Elapsed.TotalMilliseconds:F4} ms");
+        }
+    }
+}
